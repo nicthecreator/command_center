@@ -4,48 +4,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Central Web</title>
-    <!-- Tailwind CSS -->
+    <title>Login | Command Center</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body class="bg-gray-50 flex items-center justify-center h-screen font-sans antialiased">
+<body class="login-shell">
+    <div class="login-glow glow-one"></div>
+    <div class="login-glow glow-two"></div>
 
-<div class="bg-white p-8 rounded-lg shadow-lg border border-gray-200 w-full max-w-md">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-extrabold text-gray-900">Central Web</h1>
-        <p class="text-gray-500 mt-2 text-sm">Acesse seu painel administrativo</p>
-    </div>
-
-    <form method="post" class="space-y-6">
-        {% csrf_token %}
-        
-        {% if form.non_field_errors %}
-        <div class="bg-red-50 text-red-600 p-3 rounded text-sm">
-            {{ form.non_field_errors }}
+    <main class="login-card">
+        <div class="login-brand">
+            <span class="brand-mark">C</span>
+            <div>
+                <strong>Command Center</strong>
+                <span>Gestão & Operações</span>
+            </div>
         </div>
-        {% endif %}
-
-        <div>
-            <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">Usuário</label>
-            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" required
-                   class="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-            <p class="text-xs text-red-500 mt-1">{{ form.username.errors }}</p>
+        <div class="login-heading">
+            <p class="eyebrow">Acesso restrito</p>
+            <h1>Entre no seu painel</h1>
+            <p>Gerencie projetos, clientes e toda a operação em um só lugar.</p>
         </div>
 
-        <div>
-            <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">Senha</label>
-            <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required
-                   class="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500">
-            <p class="text-xs text-red-500 mt-1">{{ form.password.errors }}</p>
-        </div>
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="flash-message error">{{ form.non_field_errors }}</div>
+            {% endif %}
 
-        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-            Entrar
-        </button>
-        
-        <input type="hidden" name="next" value="{{ next|default:'' }}">
-    </form>
-</div>
+            <div>
+                <label for="{{ form.username.id_for_label }}">Usuário</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" required autocomplete="username" autofocus>
+                <p class="field-error">{{ form.username.errors }}</p>
+            </div>
+            <div>
+                <label for="{{ form.password.id_for_label }}">Senha</label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" required autocomplete="current-password">
+                <p class="field-error">{{ form.password.errors }}</p>
+            </div>
 
+            <button type="submit">Entrar no Command Center <span>→</span></button>
+            <input type="hidden" name="next" value="{{ next|default:'' }}">
+        </form>
+
+        <p class="login-footer">Ambiente administrativo · Acesso protegido</p>
+    </main>
+
+    <style>
+        .login-shell { min-height:100vh; margin:0; display:grid; place-items:center; padding:24px; background:radial-gradient(circle at top left,#e0ecff 0,#f5f7fb 38%,#eef2f7 100%); position:relative; overflow:hidden; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+        .login-glow { position:absolute; width:340px; height:340px; border-radius:50%; filter:blur(10px); opacity:.45; }
+        .glow-one { background:#bfdbfe; top:-140px; left:-80px; }
+        .glow-two { background:#c7d2fe; bottom:-170px; right:-90px; }
+        .login-card { position:relative; width:100%; max-width:430px; padding:32px; border:1px solid rgba(226,232,240,.92); border-radius:24px; background:rgba(255,255,255,.92); backdrop-filter:blur(18px); box-shadow:0 24px 70px rgba(15,23,42,.12); }
+        .login-brand { display:flex; align-items:center; gap:12px; margin-bottom:34px; }
+        .login-brand strong,.login-brand span { display:block; }
+        .login-brand strong { font-size:15px; color:#111827; }
+        .login-brand > div > span { margin-top:3px; font-size:11px; color:#94a3b8; }
+        .login-heading h1 { margin:4px 0 8px; font-size:28px; letter-spacing:-.04em; color:#0f172a; }
+        .login-heading p:last-child { margin:0; color:#64748b; font-size:13px; line-height:1.6; }
+        .login-form { margin-top:26px; display:grid; gap:17px; }
+        .login-form label { display:block; margin-bottom:7px; font-size:12px; font-weight:700; color:#334155; }
+        .login-form input { width:100%; padding:12px 13px; border:1px solid #d7dee8; border-radius:11px; box-sizing:border-box; outline:none; transition:.16s; background:#fff; }
+        .login-form input:focus { border-color:#60a5fa; box-shadow:0 0 0 4px rgba(59,130,246,.12); }
+        .login-form button { border:0; border-radius:11px; padding:12px 14px; color:#fff; background:linear-gradient(135deg,#2563eb,#1d4ed8); font-weight:800; cursor:pointer; box-shadow:0 12px 24px rgba(37,99,235,.2); }
+        .login-form button span { float:right; font-size:18px; line-height:16px; }
+        .field-error { margin:5px 0 0; color:#dc2626; font-size:11px; }
+        .login-footer { margin:22px 0 0; text-align:center; font-size:10px; color:#94a3b8; }
+    </style>
 </body>
 </html>
