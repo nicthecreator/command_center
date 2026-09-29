@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Command Center{% endblock %}</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <link href="{% static 'css/theme.css' %}" rel="stylesheet">
     <script src="{% static 'js/htmx.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
@@ -98,6 +99,10 @@
                     </div>
                 </div>
                 <div class="topbar-right">
+                    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo claro e escuro" title="Alternar tema">
+                        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.7 6.7 0 0 0 21 12.8Z"></path></svg>
+                    </button>
                     <div class="status-chip"><span class="status-dot"></span>Sistema operacional</div>
                     <div class="topbar-date" id="current-date"></div>
                 </div>
@@ -139,6 +144,20 @@
             openBtn?.addEventListener('click', () => toggle(true));
             closeBtn?.addEventListener('click', () => toggle(false));
             overlay?.addEventListener('click', () => toggle(false));
+
+            const themeToggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('command-center-theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const applyTheme = (theme) => {
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+                themeToggle?.setAttribute('aria-label', theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro');
+            };
+            applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+            themeToggle?.addEventListener('click', () => {
+                const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                localStorage.setItem('command-center-theme', next);
+                applyTheme(next);
+            });
 
             const date = document.getElementById('current-date');
             if (date) {
