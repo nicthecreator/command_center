@@ -1,79 +1,77 @@
 {% extends 'base.html' %}
-{% block title %}Configurações | Central Web{% endblock %}
-{% block header_title %}Configurações do Sistema{% endblock %}
+{% block title %}Configurações | Command Center{% endblock %}
+{% block header_title %}Configurações{% endblock %}
 
 {% block content %}
-<div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Minha Conta</h2>
-    <p class="text-sm text-gray-500">Gerencie suas informações de perfil e preferências.</p>
-</div>
-
-<!-- Alert Box -->
-{% if messages %}
-<div class="mb-6">
-    {% for message in messages %}
-    <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-50 text-green-800{% else %}bg-blue-50 text-blue-800{% endif %}">
-        {{ message }}
+<div class="settings-page">
+    <div class="settings-heading">
+        <div>
+            <p class="eyebrow">Sistema</p>
+            <h2>Configurações</h2>
+            <p>Personalize sua conta e o funcionamento do Command Center.</p>
+        </div>
+        <span class="settings-save-status" id="settings-save-status">Alterações salvas automaticamente</span>
     </div>
-    {% endfor %}
-</div>
-{% endif %}
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden max-w-4xl">
-    <div class="md:grid md:grid-cols-3 md:gap-6">
-        
-        <!-- Sidebar Interna de Configs -->
-        <div class="md:col-span-1 border-r border-gray-200 bg-gray-50">
-            <nav class="flex flex-col space-y-1 p-4">
-                <a href="#" class="bg-gray-200 text-gray-900 px-3 py-2 rounded-md font-medium text-sm">
-                    Perfil de Usuário
-                </a>
-                <a href="#" class="text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md font-medium text-sm">
-                    Preferências do Sistema
-                </a>
-                <a href="#" class="text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md font-medium text-sm">
-                    Notificações
-                </a>
-                <a href="#" class="text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md font-medium text-sm">
-                    Segurança e Senha
-                </a>
-            </nav>
-        </div>
+    <div class="settings-layout">
+        <aside class="settings-nav" aria-label="Seções de configurações">
+            <button type="button" class="settings-tab active" data-tab="perfil"><span class="settings-tab-icon">◉</span><span><strong>Perfil</strong><small>Dados da conta</small></span></button>
+            <button type="button" class="settings-tab" data-tab="preferencias"><span class="settings-tab-icon">◈</span><span><strong>Preferências</strong><small>Aparência e experiência</small></span></button>
+            <button type="button" class="settings-tab" data-tab="notificacoes"><span class="settings-tab-icon">!</span><span><strong>Notificações</strong><small>Alertas do sistema</small></span></button>
+            <button type="button" class="settings-tab" data-tab="seguranca"><span class="settings-tab-icon">⌁</span><span><strong>Segurança</strong><small>Conta e acesso</small></span></button>
+        </aside>
 
-        <!-- Formulário -->
-        <div class="mt-5 md:mt-0 md:col-span-2 p-6 md:p-8">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Informações Pessoais</h3>
-            
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.first_name.label }}</label>
-                        {{ form.first_name }}
+        <section class="settings-panel">
+            {% if messages %}
+            <div class="settings-messages">
+                {% for message in messages %}
+                <div class="settings-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="settings-content active" data-panel="perfil">
+                <div class="settings-section-title"><h3>Informações pessoais</h3><p>Esses dados são usados para identificar sua conta no sistema.</p></div>
+                <form method="post" class="settings-form">
+                    {% csrf_token %}
+                    <div class="settings-form-grid">
+                        <label>Nome<input type="text" name="{{ form.first_name.name }}" value="{{ form.first_name.value|default:'' }}" autocomplete="given-name"></label>
+                        <label>Sobrenome<input type="text" name="{{ form.last_name.name }}" value="{{ form.last_name.value|default:'' }}" autocomplete="family-name"></label>
+                        <label>Usuário<input type="text" name="{{ form.username.name }}" value="{{ form.username.value|default:'' }}" autocomplete="username"></label>
+                        <label>E-mail<input type="email" name="{{ form.email.name }}" value="{{ form.email.value|default:'' }}" autocomplete="email"></label>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.last_name.label }}</label>
-                        {{ form.last_name }}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.username.label }}</label>
-                        {{ form.username }}
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.email.label }}</label>
-                        {{ form.email }}
-                    </div>
+                    {% if form.errors %}<div class="settings-error">Verifique os campos informados e tente novamente.</div>{% endif %}
+                    <div class="settings-actions"><button type="submit" class="settings-primary">Salvar alterações</button></div>
+                </form>
+            </div>
+
+            <div class="settings-content" data-panel="preferencias">
+                <div class="settings-section-title"><h3>Preferências do sistema</h3><p>Escolha como o Command Center deve aparecer e se comportar para você.</p></div>
+                <div class="settings-options">
+                    <div class="settings-option"><div><strong>Tema da interface</strong><small>Alterne entre o modo claro e escuro.</small></div><button type="button" class="settings-choice" id="settings-theme-choice">Alternar tema</button></div>
+                    <div class="settings-option"><div><strong>Modo compacto</strong><small>Reduz o espaçamento das áreas de conteúdo.</small></div><button type="button" class="settings-switch" data-setting="compact" aria-pressed="false"><span></span></button></div>
+                    <div class="settings-option"><div><strong>Lembrar preferências</strong><small>Salva suas escolhas neste navegador.</small></div><button type="button" class="settings-switch is-on" data-setting="remember" aria-pressed="true"><span></span></button></div>
                 </div>
+            </div>
 
-                <div class="pt-5 border-t border-gray-200 flex justify-end">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow-sm">
-                        Atualizar Perfil
-                    </button>
+            <div class="settings-content" data-panel="notificacoes">
+                <div class="settings-section-title"><h3>Notificações</h3><p>Defina quais avisos você deseja receber durante o uso do sistema.</p></div>
+                <div class="settings-options">
+                    <div class="settings-option"><div><strong>Alertas de vencimento</strong><small>Avise sobre domínios e hospedagens próximos do vencimento.</small></div><button type="button" class="settings-switch is-on" data-setting="expiryAlerts" aria-pressed="true"><span></span></button></div>
+                    <div class="settings-option"><div><strong>Pagamentos pendentes</strong><small>Mostre avisos sobre pagamentos em atraso.</small></div><button type="button" class="settings-switch is-on" data-setting="paymentAlerts" aria-pressed="true"><span></span></button></div>
+                    <div class="settings-option"><div><strong>Atualizações do sistema</strong><small>Receba avisos quando houver novidades no Command Center.</small></div><button type="button" class="settings-switch" data-setting="systemAlerts" aria-pressed="false"><span></span></button></div>
                 </div>
-            </form>
-            
-        </div>
+            </div>
+
+            <div class="settings-content" data-panel="seguranca">
+                <div class="settings-section-title"><h3>Segurança e acesso</h3><p>Controles relacionados à proteção da sua conta.</p></div>
+                <div class="settings-options">
+                    <div class="settings-option"><div><strong>Sessão atual</strong><small>Você está conectado como <b>{{ user.username }}</b>.</small></div><span class="settings-badge">ATIVA</span></div>
+                    <div class="settings-option"><div><strong>Trocar senha</strong><small>Use a recuperação de senha do Django para atualizar suas credenciais.</small></div><a class="settings-secondary" href="{% url 'password_change' %}">Alterar senha</a></div>
+                    <div class="settings-option"><div><strong>Sair da conta</strong><small>Encerra sua sessão neste navegador.</small></div><form action="{% url 'logout' %}" method="post">{% csrf_token %}<button type="submit" class="settings-danger">Sair</button></form></div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}
