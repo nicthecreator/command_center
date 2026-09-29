@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Hospedagens | Central Web{% endblock %}
+{% block header_title %}Hospedagens{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Contas de Hospedagem</h2>
+    </div>
+    <a href="{% url 'hosting:create' %}" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-sm">+ Nova Hospedagem</a>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provedor / Plano</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projeto / Cliente</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vencimento</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="relative px-6 py-3"><span class="sr-only">Ações</span></th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for host in hosting %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ host.provider }}</div>
+                    <div class="text-xs text-gray-500">{{ host.plan|default:"-" }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ host.project.name|default:"-" }}</div>
+                    <div class="text-xs text-gray-500">{{ host.client.name|default:"-" }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ host.expiration_date|date:"d/m/Y"|default:"-" }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {{ host.get_status_display }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{% url 'hosting:detail' host.pk %}" class="text-blue-600 hover:text-blue-900 mr-3">Ver</a>
+                    <a href="{% url 'hosting:update' host.pk %}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Nenhuma conta cadastrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

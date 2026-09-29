@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Venda | Central Web{% endblock %}
+{% block header_title %}Detalhes da Venda{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">Venda #{{ finance.pk }}</h2>
+    <div class="flex space-x-2">
+        <a href="{% url 'finance:list' %}" class="bg-gray-100 py-2 px-4 rounded border">Voltar</a>
+        <a href="{% url 'finance:update' finance.pk %}" class="bg-blue-600 text-white py-2 px-4 rounded">Editar</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Informações</h3>
+        <p><strong>Projeto:</strong> {{ finance.project.name|default:"-" }}</p>
+        <p><strong>Cliente:</strong> {{ finance.client.name|default:"-" }}</p>
+        <p><strong>Data da Venda:</strong> {{ finance.sale_date|date:"d/m/Y"|default:"-" }}</p>
+        <p><strong>Status:</strong> {{ finance.get_status_display }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 class="text-lg font-semibold border-b pb-2 mb-4">Valores</h3>
+        <p class="text-xl"><strong>Total:</strong> R$ {{ finance.amount }}</p>
+        <p class="text-green-600 mt-2"><strong>Recebido:</strong> R$ {{ finance.total_paid }}</p>
+        <p class="text-red-600"><strong>Pendente:</strong> R$ {{ finance.pending_balance }}</p>
+    </div>
+</div>
+{% endblock %}

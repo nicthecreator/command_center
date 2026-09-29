@@ -1,0 +1,2 @@
+-r base.txt
+# Ferramentas auxiliares de desenvolvimento podem ser adicionadas aqui

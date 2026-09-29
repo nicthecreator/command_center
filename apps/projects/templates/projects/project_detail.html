@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} | Central Web{% endblock %}
+{% block header_title %}Detalhes do Projeto{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">{{ project.name }}</h2>
+        <p class="text-sm text-gray-500">Criado em {{ project.created_at|date:"d/m/Y" }}</p>
+    </div>
+    <div class="flex space-x-2">
+        <a href="{% url 'projects:list' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded shadow-sm border border-gray-300">Voltar</a>
+        <a href="{% url 'projects:update' project.slug %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-sm">Editar</a>
+        {% if project.site_url %}
+        <a href="{{ project.site_url }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow-sm">Abrir Site</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Main Column -->
+    <div class="md:col-span-2 space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Resumo</h3>
+            <p class="text-gray-700">{{ project.description_short|default:"Sem resumo disponível." }}</p>
+            <div class="mt-4">
+                <h4 class="font-medium text-gray-900">Descrição Completa:</h4>
+                <p class="text-gray-600 mt-2 whitespace-pre-wrap">{{ project.description|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Infraestrutura & URLs</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-sm font-medium text-gray-500">Site (Produção)</span>
+                    <a href="{{ project.site_url }}" class="text-blue-600 hover:underline break-words" target="_blank">{{ project.site_url|default:"-" }}</a>
+                </div>
+                <div>
+                    <span class="block text-sm font-medium text-gray-500">Ambiente de Staging</span>
+                    <a href="{{ project.staging_url }}" class="text-blue-600 hover:underline break-words" target="_blank">{{ project.staging_url|default:"-" }}</a>
+                </div>
+                <div>
+                    <span class="block text-sm font-medium text-gray-500">Repositório</span>
+                    <a href="{{ project.repository_url }}" class="text-blue-600 hover:underline break-words" target="_blank">{{ project.repository_url|default:"-" }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Status Atual</h3>
+            <div class="mb-4">
+                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            
+            <ul class="space-y-3 text-sm">
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Público (Portfólio)</span>
+                    <span class="font-medium text-gray-900">{{ project.public_visible|yesno:"Sim,Não" }}</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Cliente</span>
+                    <span class="font-medium text-gray-900">{{ project.client.name|default:"-" }}</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Categoria</span>
+                    <span class="font-medium text-gray-900">{{ project.category.name|default:"-" }}</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Comercial & Financeiro</h3>
+            <ul class="space-y-3 text-sm">
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Vendido</span>
+                    <span class="font-medium text-gray-900">{{ project.sold|yesno:"Sim,Não" }}</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Valor de Venda</span>
+                    <span class="font-medium text-gray-900">{% if project.sale_value %}R$ {{ project.sale_value }}{% else %}-{% endif %}</span>
+                </li>
+                <li class="flex justify-between">
+                    <span class="text-gray-500">Status Pgto.</span>
+                    <span class="font-medium text-gray-900">{{ project.get_payment_status_display }}</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Tecnologias</h3>
+            <div class="flex flex-wrap gap-2">
+                {% for tech in project.technologies.all %}
+                <span class="px-2 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-700 border border-gray-200">
+                    {{ tech.name }}
+                </span>
+                {% empty %}
+                <span class="text-sm text-gray-500">Nenhuma tecnologia associada.</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

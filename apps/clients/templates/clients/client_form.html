@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar {{ object.name }}{% else %}Novo Cliente{% endif %} | Central Web{% endblock %}
+{% block header_title %}{% if object %}Editar Cliente{% else %}Novo Cliente{% endif %}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">{% if object %}Editar Cliente{% else %}Novo Cliente{% endif %}</h2>
+        <p class="text-sm text-gray-500">Preencha os dados de contato e faturamento do cliente.</p>
+    </div>
+    <a href="{% if object %}{% url 'clients:detail' object.pk %}{% else %}{% url 'clients:list' %}{% endif %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded shadow-sm border border-gray-300">
+        Cancelar
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-8 max-w-4xl mx-auto">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 text-red-600 p-3 rounded mb-4">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nome -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                {{ form.name }}
+                <p class="text-xs text-red-500 mt-1">{{ form.name.errors }}</p>
+            </div>
+            
+            <!-- Razão Social -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }}</label>
+                {{ form.company_name }}
+                <p class="text-xs text-red-500 mt-1">{{ form.company_name.errors }}</p>
+            </div>
+            
+            <!-- Documento -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.document.id_for_label }}">{{ form.document.label }}</label>
+                {{ form.document }}
+                <p class="text-xs text-red-500 mt-1">{{ form.document.errors }}</p>
+            </div>
+            
+            <!-- E-mail -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                <p class="text-xs text-red-500 mt-1">{{ form.email.errors }}</p>
+            </div>
+            
+            <!-- Telefone -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                {{ form.phone }}
+                <p class="text-xs text-red-500 mt-1">{{ form.phone.errors }}</p>
+            </div>
+            
+            <!-- WhatsApp -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.whatsapp.id_for_label }}">{{ form.whatsapp.label }}</label>
+                {{ form.whatsapp }}
+                <p class="text-xs text-red-500 mt-1">{{ form.whatsapp.errors }}</p>
+            </div>
+            
+            <!-- Endereço -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                {{ form.address }}
+                <p class="text-xs text-red-500 mt-1">{{ form.address.errors }}</p>
+            </div>
+            
+            <!-- Observações -->
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+                {{ form.notes }}
+                <p class="text-xs text-red-500 mt-1">{{ form.notes.errors }}</p>
+            </div>
+            
+            <!-- Ativo -->
+            <div class="md:col-span-2 flex items-center mt-2">
+                {{ form.is_active }}
+                <label class="ml-2 block text-sm font-medium text-gray-900" for="{{ form.is_active.id_for_label }}">{{ form.is_active.label }}</label>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t flex justify-end space-x-3">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded shadow-sm">
+                Salvar Cliente
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

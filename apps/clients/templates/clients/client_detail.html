@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ client.name }} | Central Web{% endblock %}
+{% block header_title %}Detalhes do Cliente{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">{{ client.name }}</h2>
+        <p class="text-sm text-gray-500">Cliente desde {{ client.created_at|date:"d/m/Y" }}</p>
+    </div>
+    <div class="flex space-x-2">
+        <a href="{% url 'clients:list' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded shadow-sm border border-gray-300">Voltar</a>
+        <a href="{% url 'clients:update' client.pk %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-sm">Editar</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <!-- Info Card -->
+    <div class="md:col-span-1 space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Informações de Contato</h3>
+            <ul class="space-y-3 text-sm">
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">Empresa</span>
+                    <span class="text-gray-900">{{ client.company_name|default:"-" }}</span>
+                </li>
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">Documento (CPF/CNPJ)</span>
+                    <span class="text-gray-900">{{ client.document|default:"-" }}</span>
+                </li>
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">E-mail</span>
+                    <span class="text-gray-900">{{ client.email|default:"-" }}</span>
+                </li>
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">Telefone</span>
+                    <span class="text-gray-900">{{ client.phone|default:"-" }}</span>
+                </li>
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">WhatsApp</span>
+                    <span class="text-gray-900">{{ client.whatsapp|default:"-" }}</span>
+                </li>
+                <li class="flex flex-col">
+                    <span class="text-gray-500 font-medium">Endereço</span>
+                    <span class="text-gray-900">{{ client.address|default:"-" }}</span>
+                </li>
+                <li class="flex justify-between items-center mt-2 pt-2 border-t border-gray-100">
+                    <span class="text-gray-500 font-medium">Status</span>
+                    {% if client.is_active %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
+                    {% else %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inativo</span>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        
+        {% if client.notes %}
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Observações</h3>
+            <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ client.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Projects List -->
+    <div class="md:col-span-2">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">Projetos Associados</h3>
+                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">{{ client_projects|length }}</span>
+            </div>
+            
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-white">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projeto</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Ações</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for project in client_projects %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ project.name }}</div>
+                            <div class="text-xs text-gray-500">{{ project.category.name|default:"Sem categoria" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ project.created_at|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'projects:detail' project.slug %}" class="text-blue-600 hover:text-blue-900">Ver Projeto</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 text-sm">
+                            Este cliente ainda não possui projetos associados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

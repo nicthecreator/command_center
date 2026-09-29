@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ domain.domain }} | Central Web{% endblock %}
+{% block header_title %}Detalhes do Domínio{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">{{ domain.domain }}</h2>
+        <p class="text-sm text-gray-500">Registrado em {{ domain.registration_date|date:"d/m/Y"|default:"-" }}</p>
+    </div>
+    <div class="flex space-x-2">
+        <a href="{% url 'domains:list' %}" class="bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 rounded">Voltar</a>
+        <a href="{% url 'domains:update' domain.pk %}" class="bg-blue-600 text-white py-2 px-4 rounded">Editar</a>
+    </div>
+</div>
+
+<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Vínculos</h3>
+            <p><strong>Cliente:</strong> {{ domain.client.name|default:"-" }}</p>
+            <p><strong>Projeto:</strong> {{ domain.project.name|default:"-" }}</p>
+            <p><strong>Status:</strong> {{ domain.get_status_display }}</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Renovação</h3>
+            <p><strong>Registradora:</strong> {{ domain.registrar|default:"-" }}</p>
+            <p><strong>Vencimento:</strong> {{ domain.expiration_date|date:"d/m/Y"|default:"-" }}</p>
+            <p><strong>Renovação Automática:</strong> {{ domain.auto_renew|yesno:"Sim,Não" }}</p>
+        </div>
+        {% if domain.notes %}
+        <div class="md:col-span-2">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Observações</h3>
+            <p class="whitespace-pre-wrap">{{ domain.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

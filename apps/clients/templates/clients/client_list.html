@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Clientes | Central Web{% endblock %}
+{% block header_title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-800">Gerenciamento de Clientes</h2>
+        <p class="text-sm text-gray-500">Visualize e gerencie todos os clientes do sistema.</p>
+    </div>
+    <a href="{% url 'clients:create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-sm">
+        + Novo Cliente
+    </a>
+</div>
+
+<!-- Filtros Básicos HTMX -->
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
+    <form class="flex flex-col md:flex-row gap-4" hx-get="{% url 'clients:list' %}" hx-target="#client-table" hx-push-url="true">
+        <div class="flex-1">
+            <input type="text" name="q" placeholder="Buscar por nome, empresa ou email..." class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="w-full md:w-64">
+            <select name="is_active" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Todos</option>
+                <option value="true">Ativos</option>
+                <option value="false">Inativos</option>
+            </select>
+        </div>
+        <button type="submit" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded border border-gray-300">
+            Filtrar
+        </button>
+    </form>
+</div>
+
+<!-- Tabela -->
+<div id="client-table" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente / Empresa</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">Ações</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            {% for client in clients %}
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">{{ client.name }}</div>
+                    <div class="text-sm text-gray-500">{{ client.company_name|default:"-" }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ client.email|default:"Sem e-mail" }}</div>
+                    <div class="text-sm text-gray-500">{{ client.phone|default:"Sem telefone" }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {% if client.is_active %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Ativo
+                    </span>
+                    {% else %}
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        Inativo
+                    </span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{% url 'clients:detail' client.pk %}" class="text-blue-600 hover:text-blue-900 mr-3">Visualizar</a>
+                    <a href="{% url 'clients:update' client.pk %}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-10 text-center text-gray-500">
+                    Nenhum cliente encontrado.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Paginação Básica -->
+    {% if is_paginated %}
+    <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between">
+        <span class="text-sm text-gray-700">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <div class="flex space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-1 rounded text-sm font-medium">Anterior</a>
+            {% endif %}
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-1 rounded text-sm font-medium">Próxima</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

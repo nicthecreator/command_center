@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ambientes Virtuais (Virtualenvs)
+.venv/
+venv/
+ENV/
+env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Variáveis de Ambiente e Segredos (MUITO IMPORTANTE NÃO SUBIR O .env)
+.env
+.env.local
+.env.prod
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Diretórios de Dados do Docker (caso você decida mapear pastas locais para os bancos)
+pgdata/
+redisdata/
+db_data/
+
+# Tailwind CSS (opcional: ignora o binário baixado pelo pytailwindcss no cache)
+.tailwindcss-cache/

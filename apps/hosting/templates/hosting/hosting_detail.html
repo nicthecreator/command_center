@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Hospedagem | Central Web{% endblock %}
+{% block header_title %}Detalhes da Hospedagem{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">{{ hosting.provider }} - {{ hosting.plan|default:"Plano" }}</h2>
+    <div class="flex space-x-2">
+        <a href="{% url 'hosting:list' %}" class="bg-gray-100 py-2 px-4 rounded border">Voltar</a>
+        <a href="{% url 'hosting:update' hosting.pk %}" class="bg-blue-600 text-white py-2 px-4 rounded">Editar</a>
+    </div>
+</div>
+
+<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Informações</h3>
+            <p><strong>Provedor:</strong> {{ hosting.provider }}</p>
+            <p><strong>Servidor:</strong> {{ hosting.server|default:"-" }}</p>
+            <p><strong>Custo Mensal:</strong> R$ {{ hosting.monthly_cost|default:"0.00" }}</p>
+            <p><strong>Ciclo:</strong> {{ hosting.get_billing_cycle_display }}</p>
+            <p><strong>Vencimento:</strong> {{ hosting.expiration_date|date:"d/m/Y"|default:"-" }}</p>
+        </div>
+        <div>
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Vínculos e Status</h3>
+            <p><strong>Status:</strong> {{ hosting.get_status_display }}</p>
+            <p><strong>Projeto:</strong> {{ hosting.project.name|default:"-" }}</p>
+            <p><strong>Cliente:</strong> {{ hosting.client.name|default:"-" }}</p>
+        </div>
+        {% if hosting.notes %}
+        <div class="md:col-span-2">
+            <h3 class="text-lg font-semibold border-b pb-2 mb-4">Observações</h3>
+            <p class="whitespace-pre-wrap">{{ hosting.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
