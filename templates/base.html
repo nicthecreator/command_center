@@ -4,88 +4,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Central de Projetos Web{% endblock %}</title>
-    <!-- Tailwind CSS -->
+    <title>{% block title %}Command Center{% endblock %}</title>
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
-    <!-- HTMX -->
     <script src="{% static 'js/htmx.min.js' %}"></script>
     {% block head %}{% endblock %}
 </head>
-<body class="bg-gray-100 font-sans antialiased text-gray-900" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <div class="flex h-screen overflow-hidden">
-        
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex-shrink-0 hidden md:flex flex-col">
-            <div class="p-6">
-                <h1 class="text-2xl font-bold tracking-tight">Central Web</h1>
+<body class="app-shell" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div id="mobile-overlay" class="mobile-overlay" aria-hidden="true"></div>
+
+    <div class="app-layout">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <a href="{% url 'dashboard:home' %}" class="brand-link">
+                    <span class="brand-mark">C</span>
+                    <span>
+                        <span class="brand-title">Command Center</span>
+                        <span class="brand-subtitle">Gestão & Operações</span>
+                    </span>
+                </a>
+                <button id="sidebar-close" class="icon-button sidebar-close" type="button" aria-label="Fechar menu">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                </button>
             </div>
-            <nav class="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
-                <a href="{% url 'dashboard:home' %}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Dashboard</a>
-                
-                <div class="pt-4 pb-2">
-                    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gestão</p>
-                </div>
-                <a href="{% url 'projects:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Projetos</a>
-                <a href="{% url 'clients:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Clientes</a>
-                
-                <div class="pt-4 pb-2">
-                    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Infra</p>
-                </div>
-                <a href="{% url 'domains:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Domínios</a>
-                <a href="{% url 'hosting:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Hospedagens</a>
-                
-                <div class="pt-4 pb-2">
-                    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Negócios</p>
-                </div>
-                <a href="{% url 'finance:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Financeiro</a>
-                <a href="{% url 'maintenance:list' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Manutenções</a>
-                
-                <div class="pt-4 pb-2">
-                    <p class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sistema</p>
-                </div>
-                <a href="{% url 'dashboard:analytics' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Analytics</a>
-                <a href="{% url 'dashboard:monitoring' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Monitoramento</a>
-                <a href="{% url 'dashboard:alerts' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Alertas</a>
+
+            <nav class="sidebar-nav" aria-label="Navegação principal">
+                <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.resolver_match.app_name == 'dashboard' and request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <span class="nav-icon">⌂</span><span>Dashboard</span>
+                </a>
+
+                <div class="nav-section">Gestão</div>
+                <a href="{% url 'projects:list' %}" class="nav-link {% if request.resolver_match.app_name == 'projects' %}active{% endif %}">
+                    <span class="nav-icon">▣</span><span>Projetos</span>
+                </a>
+                <a href="{% url 'clients:list' %}" class="nav-link {% if request.resolver_match.app_name == 'clients' %}active{% endif %}">
+                    <span class="nav-icon">◉</span><span>Clientes</span>
+                </a>
+
+                <div class="nav-section">Infraestrutura</div>
+                <a href="{% url 'domains:list' %}" class="nav-link {% if request.resolver_match.app_name == 'domains' %}active{% endif %}">
+                    <span class="nav-icon">◎</span><span>Domínios</span>
+                </a>
+                <a href="{% url 'hosting:list' %}" class="nav-link {% if request.resolver_match.app_name == 'hosting' %}active{% endif %}">
+                    <span class="nav-icon">▤</span><span>Hospedagens</span>
+                </a>
+
+                <div class="nav-section">Negócios</div>
+                <a href="{% url 'finance:list' %}" class="nav-link {% if request.resolver_match.app_name == 'finance' %}active{% endif %}">
+                    <span class="nav-icon">R$</span><span>Financeiro</span>
+                </a>
+                <a href="{% url 'maintenance:list' %}" class="nav-link {% if request.resolver_match.app_name == 'maintenance' %}active{% endif %}">
+                    <span class="nav-icon">↻</span><span>Manutenções</span>
+                </a>
+
+                <div class="nav-section">Sistema</div>
+                <a href="{% url 'dashboard:analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+                    <span class="nav-icon">◩</span><span>Analytics</span>
+                </a>
+                <a href="{% url 'dashboard:monitoring' %}" class="nav-link {% if request.resolver_match.url_name == 'monitoring' %}active{% endif %}">
+                    <span class="nav-icon">◌</span><span>Monitoramento</span>
+                </a>
+                <a href="{% url 'dashboard:alerts' %}" class="nav-link {% if request.resolver_match.url_name == 'alerts' %}active{% endif %}">
+                    <span class="nav-icon">!</span><span>Alertas</span>
+                </a>
             </nav>
-            <div class="p-4 border-t border-gray-800">
-                <a href="{% url 'dashboard:settings' %}" class="block py-2 px-4 rounded transition duration-200 hover:bg-gray-800 text-gray-300 hover:text-white">Configurações</a>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'dashboard:settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <span class="nav-icon">⚙</span><span>Configurações</span>
+                </a>
+                <div class="sidebar-user">
+                    <span class="avatar">{{ user.username|default:"A"|slice:":1"|upper }}</span>
+                    <span class="user-meta">
+                        <strong>{{ user.username|default:"Admin" }}</strong>
+                        <small>Administrador</small>
+                    </span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button" title="Sair" aria-label="Sair">↗</button>
+                    </form>
+                </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col overflow-hidden">
-            <!-- Navbar -->
-            <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 z-10">
-                <div class="flex items-center">
-                    <button class="text-gray-500 focus:outline-none md:hidden">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
+        <main class="main-area">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="sidebar-open" class="icon-button mobile-menu-button" type="button" aria-label="Abrir menu">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
                     </button>
-                    <h2 class="text-xl font-semibold text-gray-800 ml-4 md:ml-0">{% block header_title %}Painel{% endblock %}</h2>
+                    <div>
+                        <p class="eyebrow">Command Center</p>
+                        <h1>{% block header_title %}Painel{% endblock %}</h1>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-sm text-gray-600">Olá, {{ user.username|default:"Admin" }}</div>
-                    <form action="{% url 'logout' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded transition-colors">
-                            Sair
-                        </button>
-                    </form>
+                <div class="topbar-right">
+                    <div class="status-chip"><span class="status-dot"></span>Sistema operacional</div>
+                    <div class="topbar-date" id="current-date"></div>
                 </div>
             </header>
 
-            <!-- Content Area -->
-            <div class="flex-1 overflow-y-auto bg-gray-50 p-6">
-                {% block content %}
-                <!-- Default Content -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                    <h3 class="text-2xl font-semibold text-gray-800 mb-2">Bem-vindo à Central de Projetos Web</h3>
-                    <p class="text-gray-500 mb-6">A infraestrutura do seu painel administrativo está pronta.</p>
+            <div class="page-content">
+                {% if messages %}
+                <div class="flash-stack">
+                    {% for message in messages %}
+                    <div class="flash-message {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}">
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
+                {% endif %}
+
+                {% block content %}
+                <section class="empty-state">
+                    <div class="empty-icon">C</div>
+                    <h2>Bem-vindo ao Command Center</h2>
+                    <p>Centralize seus projetos, clientes, infraestrutura e operações em um único painel.</p>
+                </section>
                 {% endblock %}
             </div>
         </main>
     </div>
+
+    <script>
+        (() => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const openBtn = document.getElementById('sidebar-open');
+            const closeBtn = document.getElementById('sidebar-close');
+            const toggle = (open) => {
+                sidebar.classList.toggle('open', open);
+                overlay.classList.toggle('visible', open);
+                document.body.classList.toggle('menu-open', open);
+            };
+            openBtn?.addEventListener('click', () => toggle(true));
+            closeBtn?.addEventListener('click', () => toggle(false));
+            overlay?.addEventListener('click', () => toggle(false));
+
+            const date = document.getElementById('current-date');
+            if (date) {
+                date.textContent = new Intl.DateTimeFormat('pt-BR', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                }).format(new Date());
+            }
+        })();
+    </script>
 </body>
 </html>
