@@ -70,3 +70,5 @@ html.dark .login-heading p:last-child,html.dark .login-brand>div>span{color:#999
 html.dark .login-form label{color:#ddd}
 html.dark .login-form input{background:#121214;color:#f5f5f5;border-color:#343438}
 html.dark .login-footer{color:#777}
+
+@media(max-width:900px){.topbar-right{display:flex!important}.topbar-right .status-chip,.topbar-right .topbar-date{display:none}.theme-toggle{width:36px;height:36px}}
