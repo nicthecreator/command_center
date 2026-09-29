@@ -1,108 +1,129 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | Central Web{% endblock %}
+{% block title %}Dashboard | Command Center{% endblock %}
 {% block header_title %}Dashboard{% endblock %}
 
 {% block head %}
-<!-- Chart.js via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Visão Geral</h2>
-    <p class="text-sm text-gray-500">Acompanhe as principais métricas do seu negócio.</p>
-</div>
-
-<!-- Cards de Métricas -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 flex items-center justify-between">
+    <div class="flex items-end justify-between gap-4">
         <div>
-            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Projetos Ativos</p>
-            <p class="text-3xl font-bold text-gray-900 mt-1">{{ active_projects_count }}</p>
-        </div>
-        <div class="bg-blue-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-        </div>
-    </div>
-    
-    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">MRR (Manutenções)</p>
-            <p class="text-3xl font-bold text-green-600 mt-1">R$ {{ mrr }}</p>
-        </div>
-        <div class="bg-green-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-    </div>
-    
-    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200 flex items-center justify-between">
-        <div>
-            <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">A Receber</p>
-            <p class="text-3xl font-bold text-orange-600 mt-1">R$ {{ pending_receivables }}</p>
-        </div>
-        <div class="bg-orange-100 p-3 rounded-full">
-            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="text-xs font-bold uppercase tracking-wider text-blue-600">Visão geral</p>
+            <h2 class="text-3xl font-extrabold text-gray-900 mt-1">Painel de operação</h2>
+            <p class="text-sm text-gray-500 mt-2">Acompanhe projetos, recorrência financeira e próximos vencimentos.</p>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Gráfico -->
-    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Projetos por Status</h3>
-        <div class="relative h-64 w-full">
-            <canvas id="projectsChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Próximos Vencimentos -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Próximos Vencimentos
-        </h3>
-        
-        <div class="space-y-4">
-            <div class="border-b pb-2">
-                <h4 class="text-sm font-bold text-gray-600 mb-2">Domínios</h4>
-                <ul class="space-y-2">
-                    {% for d in upcoming_domains %}
-                    <li class="flex justify-between items-center text-sm">
-                        <a href="{% url 'domains:detail' d.pk %}" class="text-blue-600 hover:underline truncate max-w-[150px]">{{ d.domain }}</a>
-                        <span class="text-gray-500">{{ d.expiration_date|date:"d/m" }}</span>
-                    </li>
-                    {% empty %}
-                    <li class="text-xs text-gray-400">Nenhum domínio próximo do vencimento.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-7">
+    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <div class="flex items-start justify-between">
             <div>
-                <h4 class="text-sm font-bold text-gray-600 mb-2">Hospedagens</h4>
-                <ul class="space-y-2">
-                    {% for h in upcoming_hosting %}
-                    <li class="flex justify-between items-center text-sm">
-                        <a href="{% url 'hosting:detail' h.pk %}" class="text-blue-600 hover:underline truncate max-w-[150px]">{{ h.provider }}</a>
-                        <span class="text-gray-500">{{ h.expiration_date|date:"d/m" }}</span>
-                    </li>
-                    {% empty %}
-                    <li class="text-xs text-gray-400">Nenhuma hospedagem próxima do vencimento.</li>
-                    {% endfor %}
-                </ul>
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Projetos ativos</p>
+                <p class="text-3xl font-extrabold text-gray-900 mt-2">{{ active_projects_count }}</p>
+                <p class="text-xs text-gray-400 mt-2">Em acompanhamento</p>
             </div>
+            <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">▣</div>
         </div>
     </div>
+
+    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">MRR</p>
+                <p class="text-3xl font-extrabold text-gray-900 mt-2">R$ {{ mrr }}</p>
+                <p class="text-xs text-gray-400 mt-2">Manutenções recorrentes</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">R$</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-500">A receber</p>
+                <p class="text-3xl font-extrabold text-gray-900 mt-2">R$ {{ pending_receivables }}</p>
+                <p class="text-xs text-gray-400 mt-2">Valores pendentes</p>
+            </div>
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">◷</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <section class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-extrabold text-gray-900">Projetos por status</h3>
+                <p class="text-xs text-gray-500 mt-1">Distribuição atual dos projetos cadastrados.</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-gray-50 text-gray-500 text-xs font-semibold">Visão atual</span>
+        </div>
+        <div class="p-6">
+            <div class="relative h-72 w-full">
+                <canvas id="projectsChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100">
+            <h3 class="text-base font-extrabold text-gray-900">Próximos vencimentos</h3>
+            <p class="text-xs text-gray-500 mt-1">Domínios e hospedagens nos próximos dias.</p>
+        </div>
+        <div class="p-6">
+            <div class="space-y-5">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600">Domínios</h4>
+                    </div>
+                    <ul class="space-y-2.5">
+                        {% for d in upcoming_domains %}
+                        <li class="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-gray-50">
+                            <a href="{% url 'domains:detail' d.pk %}" class="text-sm font-semibold text-gray-800 hover:text-blue-600 truncate">{{ d.domain }}</a>
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">{{ d.expiration_date|date:"d/m" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="text-xs text-gray-400 py-2">Nenhum domínio próximo do vencimento.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-600">Hospedagens</h4>
+                    </div>
+                    <ul class="space-y-2.5">
+                        {% for h in upcoming_hosting %}
+                        <li class="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-gray-50">
+                            <a href="{% url 'hosting:detail' h.pk %}" class="text-sm font-semibold text-gray-800 hover:text-blue-600 truncate">{{ h.provider }}</a>
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">{{ h.expiration_date|date:"d/m" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="text-xs text-gray-400 py-2">Nenhuma hospedagem próxima do vencimento.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('projectsChart').getContext('2d');
+        const el = document.getElementById('projectsChart');
+        if (!el) return;
+
+        const ctx = el.getContext('2d');
         const labels = {{ chart_labels|safe }};
         const data = {{ chart_data|safe }};
-        
-        // Se não houver dados, adiciona um placeholder
-        if(data.length === 0) {
+
+        if (data.length === 0) {
             labels.push('Nenhum projeto');
             data.push(1);
         }
@@ -110,23 +131,25 @@
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: labels,
+                labels,
                 datasets: [{
-                    label: 'Projetos',
-                    data: data,
-                    backgroundColor: [
-                        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6b7280'
-                    ],
-                    borderWidth: 1
+                    data,
+                    backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'],
+                    borderColor: '#ffffff',
+                    borderWidth: 4,
+                    hoverOffset: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '68%',
                 plugins: {
                     legend: {
-                        position: 'right',
-                    }
+                        position: window.innerWidth < 700 ? 'bottom' : 'right',
+                        labels: { usePointStyle: true, boxWidth: 9, padding: 18, font: { size: 11, weight: '600' } }
+                    },
+                    tooltip: { padding: 12, cornerRadius: 10 }
                 }
             }
         });
