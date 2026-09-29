@@ -1,48 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Configurações | Command Center
-<script>
-(() => {
-    const tabs = document.querySelectorAll('.settings-tab');
-    const panels = document.querySelectorAll('.settings-content');
-    const status = document.getElementById('settings-save-status');
-    const saved = JSON.parse(localStorage.getItem('command-center-settings') || '{}');
-
-    const showTab = (name) => {
-        tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === name));
-        panels.forEach(panel => panel.classList.toggle('active', panel.dataset.panel === name));
-        history.replaceState(null, '', '#'+name);
-    };
-    tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
-    const initial = location.hash.replace('#','');
-    showTab([...document.querySelectorAll('.settings-tab')].some(t => t.dataset.tab === initial) ? initial : 'perfil');
-
-    const save = (key, value) => {
-        saved[key] = value;
-        localStorage.setItem('command-center-settings', JSON.stringify(saved));
-        if (status) { status.textContent = 'Preferência salva'; setTimeout(() => status.textContent = 'Alterações salvas automaticamente', 1200); }
-    };
-
-    document.querySelectorAll('.settings-switch').forEach(button => {
-        const key = button.dataset.setting;
-        if (key in saved) button.classList.toggle('is-on', !!saved[key]);
-        button.setAttribute('aria-pressed', button.classList.contains('is-on'));
-        button.addEventListener('click', () => {
-            const on = !button.classList.contains('is-on');
-            button.classList.toggle('is-on', on);
-            button.setAttribute('aria-pressed', on);
-            save(key, on);
-            if (key === 'compact') document.body.classList.toggle('compact-mode', on);
-        });
-    });
-    if (saved.compact) document.body.classList.add('compact-mode');
-
-    document.getElementById('settings-theme-choice')?.addEventListener('click', () => {
-        document.getElementById('theme-toggle')?.click();
-        save('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-    });
-})();
-</script>
-{% endblock %}
+{% block title %}Configurações | Command Center{% endblock %}
 {% block header_title %}Configurações{% endblock %}
 
 {% block content %}
@@ -58,10 +15,10 @@
 
     <div class="settings-layout">
         <aside class="settings-nav" aria-label="Seções de configurações">
-            <button type="button" class="settings-tab active" data-tab="perfil"><span class="settings-tab-icon">◉</span><span><strong>Perfil</strong><small>Dados da conta</small></span></button>
-            <button type="button" class="settings-tab" data-tab="preferencias"><span class="settings-tab-icon">◈</span><span><strong>Preferências</strong><small>Aparência e experiência</small></span></button>
-            <button type="button" class="settings-tab" data-tab="notificacoes"><span class="settings-tab-icon">!</span><span><strong>Notificações</strong><small>Alertas do sistema</small></span></button>
-            <button type="button" class="settings-tab" data-tab="seguranca"><span class="settings-tab-icon">⌁</span><span><strong>Segurança</strong><small>Conta e acesso</small></span></button>
+            <button type="button" class="settings-tab active" data-tab="perfil" aria-selected="true"><span class="settings-tab-icon">◉</span><span><strong>Perfil</strong><small>Dados da conta</small></span></button>
+            <button type="button" class="settings-tab" data-tab="preferencias" aria-selected="false"><span class="settings-tab-icon">◈</span><span><strong>Preferências</strong><small>Aparência e experiência</small></span></button>
+            <button type="button" class="settings-tab" data-tab="notificacoes" aria-selected="false"><span class="settings-tab-icon">!</span><span><strong>Notificações</strong><small>Alertas do sistema</small></span></button>
+            <button type="button" class="settings-tab" data-tab="seguranca" aria-selected="false"><span class="settings-tab-icon">⌁</span><span><strong>Segurança</strong><small>Conta e acesso</small></span></button>
         </aside>
 
         <section class="settings-panel">
@@ -118,3 +75,83 @@
     </div>
 </div>
 {% endblock %}
+
+<script>
+(() => {
+    const initSettings = () => {
+        const tabs = document.querySelectorAll('.settings-tab');
+        const panels = document.querySelectorAll('.settings-content');
+        const status = document.getElementById('settings-save-status');
+        if (!tabs.length || !panels.length) return;
+
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem('command-center-settings') || '{}'); }
+        catch (error) { saved = {}; }
+
+        const showTab = (name, updateHash = true) => {
+            const valid = [...tabs].some(tab => tab.dataset.tab === name);
+            const activeName = valid ? name : 'perfil';
+            tabs.forEach(tab => {
+                const active = tab.dataset.tab === activeName;
+                tab.classList.toggle('active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            panels.forEach(panel => panel.classList.toggle('active', panel.dataset.panel === activeName));
+            if (updateHash) history.replaceState(null, '', '#' + activeName);
+        };
+
+        tabs.forEach(tab => tab.addEventListener('click', (event) => {
+            event.preventDefault();
+            showTab(tab.dataset.tab);
+        }));
+
+        showTab(window.location.hash.replace('#', '') || 'perfil', false);
+
+        const save = (key, value) => {
+            saved[key] = value;
+            if (saved.remember !== false) localStorage.setItem('command-center-settings', JSON.stringify(saved));
+            if (status) {
+                status.textContent = 'Preferência salva';
+                clearTimeout(status._timer);
+                status._timer = setTimeout(() => status.textContent = 'Alterações salvas automaticamente', 1200);
+            }
+        };
+
+        document.querySelectorAll('.settings-switch').forEach(button => {
+            const key = button.dataset.setting;
+            if (key in saved) button.classList.toggle('is-on', Boolean(saved[key]));
+            button.setAttribute('aria-pressed', button.classList.contains('is-on') ? 'true' : 'false');
+
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const on = !button.classList.contains('is-on');
+                button.classList.toggle('is-on', on);
+                button.setAttribute('aria-pressed', on ? 'true' : 'false');
+
+                if (key === 'remember' && !on) {
+                    saved = { remember: false };
+                    localStorage.removeItem('command-center-settings');
+                } else {
+                    save(key, on);
+                }
+
+                if (key === 'compact') document.body.classList.toggle('compact-mode', on);
+            });
+        });
+
+        if (saved.compact) document.body.classList.add('compact-mode');
+
+        document.getElementById('settings-theme-choice')?.addEventListener('click', (event) => {
+            event.preventDefault();
+            document.getElementById('theme-toggle')?.click();
+            save('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+    };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSettings, { once: true });
+    } else {
+        initSettings();
+    }
+})();
+</script>
